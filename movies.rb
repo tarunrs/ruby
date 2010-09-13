@@ -26,9 +26,10 @@ get '/tarunrs/movies' do
 				ttd = section.at("b")
 				dat = ttd.to_s.gsub(/<\/?[^>]*>/, "");
 				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
-				dats = dat.split(" ")
-				if(dats[1] != nil) 
-					current_date = dats[1]
+				dats = dat.to_s.gsub("&rsaquo; ","")
+				dats = dats.strip
+				if (dats != nil and !dats.empty?)
+					current_date = dats
 				end
 			}
 		
@@ -90,9 +91,10 @@ get '/tarunrs/theaters' do
 				ttd = section.at("b")
 				dat = ttd.to_s.gsub(/<\/?[^>]*>/, "");
 				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
-				dats = dat.split(" ")
-				if(dats[1] != nil) 
-					current_date = dats[1]
+				dats = dat.to_s.gsub("&rsaquo; ","")
+				dats = dats.strip
+				if (dats != nil and !dats.empty?)
+					current_date = dats
 				end
 			}
 
@@ -102,10 +104,9 @@ get '/tarunrs/theaters' do
 			links.map.each {|link| 
 				header = link/"//div[@class=desc]"
 				theaterList = Hash.new()
-				theaterList["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
-				
-				theaterList["movies"] = Array.new()
+				theaterList["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("h2").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'").to_s.gsub(/<\/?[^>]*>/, "")
 
+				theaterList["movies"] = Array.new()
 				movies = link/"//div[@class=movie]"
 				movies.map.each {|movie|
 						name = movie/"//div[@class=name]"

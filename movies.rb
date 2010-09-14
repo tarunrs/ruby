@@ -65,7 +65,7 @@ get '/tarunrs/movies' do
 			flag =0
 		end
 	end
-	listing.sort_by { |listt| listt["name"]}
+	listing = listing.sort_by{|listt| listt["name"]}
 	headers({"Content-Type" => "text/html; charset=ISO-8859-1"})
 	{"result" => {"date" => current_date, "listing" => listing, "location" => location}}.to_json
 
@@ -129,6 +129,7 @@ get '/tarunrs/theaters' do
 			flag =0
 		end
 	end
+	listing = listing.sort_by{|listt| listt["name"]}
 	headers({"Content-Type" => "text/html; charset=ISO-8859-1"})
 	{"result" => {"date" => current_date, "listing" => listing, "location" => location}}.to_json
 

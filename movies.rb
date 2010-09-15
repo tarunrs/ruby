@@ -4,7 +4,7 @@ require 'sinatra'
 require 'json'
 require 'hpricot'
 require 'cgi'
-require 'iconv'
+#require 'iconv'
 
 get '/tarunrs/movies' do
 	listing = []
@@ -16,8 +16,11 @@ get '/tarunrs/movies' do
 		current_date = "-"
 		doc = Hpricot(open(url))
 		title_bar = doc/"//h1[@id=title_bar]"
+		#ic = Iconv.new('US-ASCII//IGNORE', 'UTF-8')
+
 		location = title_bar.to_s.gsub(/<\/?[^>]*>/, "");
-		location = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', location).pop
+#		location = ic.iconv(location ).pop
+#		location = ic.iconv(location + ' ')[0..-2]
 		
 		left_nav =  doc/"//div[@id=left_nav]"
 		sections = left_nav/"//div[@class=section]"
@@ -25,7 +28,8 @@ get '/tarunrs/movies' do
 		days.map.each {|section| 
 				ttd = section.at("b")
 				dat = ttd.to_s.gsub(/<\/?[^>]*>/, "");
-				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
+#				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
+#				dat = ic.iconv(dat + ' ')[0..-2]
 				dats = dat.to_s.gsub("&rsaquo; ","")
 				dats = dats.strip
 				if (dats != nil and !dats.empty?)
@@ -40,7 +44,8 @@ get '/tarunrs/movies' do
 			links.map.each {|link| 
 				header = link/"//div[@class=desc]"
 				movie = Hash.new()
-				movie["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+				#movie["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+				movie["name"] = header.at("a").inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
 				movie["rating"] = header.at("img")
 				if(movie["rating"]!= nil)
 					regex = Regexp.new(/.*Rated (.*) out of.*/)
@@ -54,8 +59,12 @@ get '/tarunrs/movies' do
 						name = theater/"//div[@class=name]"
 						showtimes = theater/"//div[@class=times]"
 						theaterHash = Hash.new()
-						theaterHash["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8',theater.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
-						theaterHash["times"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', showtimes.inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
+#						theaterHash["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8',theater.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+#						theaterHash["name"]  = ic.iconv(theater.at("a").inner_html + ' ')[0..-2].gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+						theaterHash["name"]  = theater.at("a").inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+						theaterHash["times"] = showtimes.inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
+
+#						theaterHash["times"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', showtimes.inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
 						movie["theaters"].push(theaterHash)
 						}
 				listing.push(movie)
@@ -80,9 +89,10 @@ get '/tarunrs/theaters' do
 		current_date = "-"
 		doc = Hpricot(open(url))
 		title_bar = doc/"//h1[@id=title_bar]"
-
+#		ic = Iconv.new('US-ASCII//IGNORE', 'UTF-8')
 		location = title_bar.to_s.gsub(/<\/?[^>]*>/, "");
-		location = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', location).pop
+		#location = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', location).pop
+#		location = ic.iconv(location + ' ')[0..-2]
 
 		left_nav =  doc/"//div[@id=left_nav]"
 		sections = left_nav/"//div[@class=section]"
@@ -90,7 +100,8 @@ get '/tarunrs/theaters' do
 		days.map.each {|section| 
 				ttd = section.at("b")
 				dat = ttd.to_s.gsub(/<\/?[^>]*>/, "");
-				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
+#				dat = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', dat).pop
+#				dat = ic.iconv(dat + ' ')[0..-2]
 				dats = dat.to_s.gsub("&rsaquo; ","")
 				dats = dats.strip
 				if (dats != nil and !dats.empty?)
@@ -104,8 +115,9 @@ get '/tarunrs/theaters' do
 			links.map.each {|link| 
 				header = link/"//div[@class=desc]"
 				theaterList = Hash.new()
-				theaterList["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("h2").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'").to_s.gsub(/<\/?[^>]*>/, "")
+#				theaterList["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', header.at("h2").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'").to_s.gsub(/<\/?[^>]*>/, "")
 
+				theaterList["name"] = header.at("h2").inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'").to_s.gsub(/<\/?[^>]*>/, "")
 				theaterList["movies"] = Array.new()
 				movies = link/"//div[@class=movie]"
 				movies.map.each {|movie|
@@ -118,8 +130,12 @@ get '/tarunrs/theaters' do
 							sub_string = regex.match( movieHash["rating"].to_s)
 							movieHash["rating"] = sub_string[1]
 						end
-						movieHash["name"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8',movie.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
-						movieHash["times"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', showtimes.inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
+#						movieHash["name"] = ic.iconv('US-ASCII//IGNORE', 'UTF-8',movie.at("a").inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+#						movieHash["name"] = ic.iconv(movie.at("a").inner_html + ' ')[0..-2]..gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+#						movieHash["times"] = Iconv.iconv('US-ASCII//IGNORE', 'UTF-8', showtimes.inner_html).pop.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
+						movieHash["name"] = movie.at("a").inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub("&#39;","'")
+						movieHash["times"] = showtimes.inner_html.gsub("&nbsp;","").gsub("&amp;","&").gsub(/<\/?[^>]*>/, "")
+
 						theaterList["movies"].push(movieHash)
 						}
 				listing.push(theaterList)
